@@ -1,10 +1,23 @@
-# Proyecto: Gesture Controller
+# Proyecto: Control por Gestos Basado en Visión Artificial
 
 Este proyecto fue desarrollado por **Miguel Ángel Choque García** de la **Universidad San Francisco Xavier de Chuquisaca (USFX)** como parte de sus estudios en **desarrollo de aplicaciones inteligentes**. El objetivo principal es crear un sistema capaz de controlar aplicaciones utilizando gestos manuales capturados a través de una cámara.
 
 ## Descripción
 
-El Gesture Controller permite la detección de gestos de manos para interactuar con el sistema. Utiliza herramientas como OpenCV, MediaPipe y otras bibliotecas para implementar funcionalidades como control de volumen, brillo y desplazamiento mediante gestos específicos.
+El Gesture Controller permite la detección de gestos de manos para interactuar con el sistema. Utiliza herramientas como **OpenCV** y **MediaPipe** para implementar funcionalidades como control de volumen, brillo y desplazamiento mediante gestos específicos.
+
+- **OpenCV (Visión por Computadora):**  
+  OpenCV se utiliza para capturar imágenes desde la cámara, procesarlas (por ejemplo, cambiar el formato de color) y mostrar los resultados visuales en tiempo real. Es la base del manejo de imágenes en el proyecto.
+
+- **MediaPipe (Visión Artificial):**  
+  MediaPipe proporciona algoritmos avanzados de inteligencia artificial para detectar landmarks (puntos clave) en las manos y clasificarlas como izquierda o derecha. Estos landmarks son procesados posteriormente para interpretar los gestos del usuario.
+
+### Ejemplo de Uso:
+1. **Captura de imágenes con OpenCV:**  
+   OpenCV abre la cámara, captura los frames de video y los prepara para el procesamiento posterior.
+
+2. **Procesamiento de landmarks con MediaPipe:**  
+   MediaPipe analiza las imágenes capturadas y detecta landmarks, permitiendo reconocer gestos como pinzas, puños y movimientos de los dedos.
 
 ## Estructura del proyecto
 
@@ -58,13 +71,12 @@ conda install pywin32
 
 El proyecto utiliza las siguientes bibliotecas y versiones especificadas en el archivo `requirements.txt`:
 
-- **opencv-python==4.5.3.56**
-- **mediapipe==0.8.6.2**
-- **pyautogui==0.9.53**
-- **comtypes==1.1.11**
-- **pycaw==20181226**
-- **screen-brightness-control==0.9.0**
-- **google-protobuf>=3.19.0**
+- **opencv-python==4.5.3.56**: Captura y manejo de imágenes en tiempo real.
+- **mediapipe==0.8.6.2**: Detección de landmarks y procesamiento de gestos con IA.
+- **pyautogui==0.9.53**: Control del cursor y simulación de interacciones del ratón.
+- **comtypes==1.1.11**: Comunicación con bibliotecas del sistema (usado para controlar el volumen).
+- **pycaw==20181226**: Manejo del volumen del sistema.
+- **screen-brightness-control==0.9.0**: Ajuste del brillo del sistema.
 
 ## Uso
 

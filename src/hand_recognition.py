@@ -3,7 +3,7 @@ from .enums.gesture_enums import Gest, HLabel
 
 class HandRecog:
     """
-    Convierte los puntos de referencia de MediaPipe en gestos reconocibles.
+    Convierte los puntos de referencia de MediaPipe en gestos reconocibles utilizando **Visión Artificial**.
     """
 
     def __init__(self, hand_label):
@@ -91,7 +91,7 @@ class HandRecog:
 
     def set_finger_state(self):
         """
-        Actualiza el estado de los dedos evaluando la relación de distancia
+        **Visión Artificial**: Actualiza el estado de los dedos evaluando la relación de distancia
         entre el punto de la punta, la articulación media y la base del dedo.
 
         Returns
@@ -111,7 +111,7 @@ class HandRecog:
 
     def get_gesture(self):
         """
-        Determina el gesto actual basado en el estado de los dedos y la distancia entre puntos clave.
+        **Visión Artificial**:Determina el gesto actual basado en el estado de los dedos y la distancia entre puntos clave.
 
         Returns
         -------

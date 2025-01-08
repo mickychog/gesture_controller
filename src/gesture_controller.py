@@ -121,6 +121,8 @@ class GestureController:
                 if current_time - last_frame_time < 1 / 15:  # Limitar a 15 FPS
                     continue
                 last_frame_time = current_time
+                
+                # **Visión por Computadora**: Captura de la cámara y detección de manos
                 success, image = GestureController.cap.read()
 
                 if not success:
@@ -136,6 +138,7 @@ class GestureController:
                 image.flags.writeable = True
                 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
+                 # **Visión Artificial**: Uso de landmarks para reconocer gestos
                 if results.multi_hand_landmarks:                   
                     GestureController.classify_hands(results)
                     handmajor.update_hand_result(GestureController.hr_major)
@@ -145,11 +148,20 @@ class GestureController:
                     handminor.set_finger_state()
                     gest_name = handminor.get_gesture()
 
-                    # Procesa los gestos y ejecuta las acciones correspondientes
+                # Asegurarse de que gest_name sea un miembro del enum Gest
+                    try:
+                        gest_name = Gest(gest_name)
+                    except ValueError:
+                        print(f"Gesto no reconocido: {gest_name}")
+                        continue
+                
+                # Mostrar el gesto reconocido en consola
                     if gest_name == Gest.PINCH_MINOR:
+                        print(f"Gesto reconocido: {gest_name.name} (Pinza menor - Desplazamiento)")
                         Controller.handle_controls(gest_name, handminor.hand_result)
                     else:
-                        gest_name = handmajor.get_gesture()
+                        gest_name = Gest(handmajor.get_gesture())  # Convertir también aquí
+                        print(f"Gesto reconocido: {gest_name.name} (Pinza mayor - Volumen/Brillo)")
                         Controller.handle_controls(gest_name, handmajor.hand_result)
                     
                     # Dibuja los landmarks de las manos

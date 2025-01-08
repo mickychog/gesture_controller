@@ -2,13 +2,7 @@ import pyautogui
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 from comtypes import CLSCTX_ALL
 from ctypes import cast, POINTER
-
-# Verificar si el módulo screen_brightness_control está disponible
-try:
-    import screen_brightness_control as sbcontrol
-except ImportError:
-    sbcontrol = None
-
+import screen_brightness_control as sbcontrol
 from .enums.gesture_enums import Gest, HLabel
 
 class Controller:
@@ -49,6 +43,7 @@ class Controller:
 
     tx_old = 0
     ty_old = 0
+    trial = True
     flag = False
     grabflag = False
     pinchmajorflag = False
@@ -61,39 +56,46 @@ class Controller:
     framecount = 0
     prev_hand = None
     pinch_threshold = 0.3
+    
+    def getpinchylv(hand_result):
+        """Devuelve la distancia en el eje Y entre el inicio del gesto de pinza y la posición actual."""
+        dist = round((Controller.pinchstartycoord - hand_result.landmark[8].y) * 10, 1)
+        return dist
 
-    @staticmethod
+    def getpinchxlv(hand_result):
+        """Devuelve la distancia en el eje X entre el inicio del gesto de pinza y la posición actual."""
+        dist = round((hand_result.landmark[8].x - Controller.pinchstartxcoord) * 10, 1)
+        return dist
+    
     def changesystembrightness():
+        """**Visión Artificial**: Control del brillo basado en gestos."""
         """Ajusta el brillo del sistema según el valor de `Controller.pinchlv`."""
-        if not sbcontrol:
-            print("Control de brillo no disponible.")
-            return
-
         currentBrightnessLv = sbcontrol.get_brightness(display=0) / 100.0
         currentBrightnessLv += Controller.pinchlv / 50.0
-        currentBrightnessLv = min(max(currentBrightnessLv, 0.0), 1.0)  # Limitar entre 0.0 y 1.0
+        if currentBrightnessLv > 1.0:
+            currentBrightnessLv = 1.0
+        elif currentBrightnessLv < 0.0:
+            currentBrightnessLv = 0.0       
         sbcontrol.fade_brightness(int(100 * currentBrightnessLv), start=sbcontrol.get_brightness(display=0))
-
-    @staticmethod
+    
     def changesystemvolume():
+        """**Visión Artificial**: Ajuste del volumen según gestos."""
         """Ajusta el volumen del sistema según el valor de `Controller.pinchlv`."""
-        try:
-            devices = AudioUtilities.GetSpeakers()
-            interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-            volume = cast(interface, POINTER(IAudioEndpointVolume))
-            currentVolumeLv = volume.GetMasterVolumeLevelScalar()
-            currentVolumeLv += Controller.pinchlv / 50.0
-            currentVolumeLv = min(max(currentVolumeLv, 0.0), 1.0)  # Limitar entre 0.0 y 1.0
-            volume.SetMasterVolumeLevelScalar(currentVolumeLv, None)
-        except Exception as e:
-            print(f"Error al ajustar el volumen: {e}")
-
-    @staticmethod
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        volume = cast(interface, POINTER(IAudioEndpointVolume))
+        currentVolumeLv = volume.GetMasterVolumeLevelScalar()
+        currentVolumeLv += Controller.pinchlv / 50.0
+        if currentVolumeLv > 1.0:
+            currentVolumeLv = 1.0
+        elif currentVolumeLv < 0.0:
+            currentVolumeLv = 0.0
+        volume.SetMasterVolumeLevelScalar(currentVolumeLv, None)
+    
     def scrollVertical():
         """Realiza un desplazamiento vertical en pantalla."""
         pyautogui.scroll(120 if Controller.pinchlv > 0.0 else -120)
-
-    @staticmethod
+        
     def scrollHorizontal():
         """Realiza un desplazamiento horizontal en pantalla."""
         pyautogui.keyDown('shift')
@@ -102,7 +104,6 @@ class Controller:
         pyautogui.keyUp('ctrl')
         pyautogui.keyUp('shift')
 
-    @staticmethod
     def get_position(hand_result):
         """
         Devuelve las coordenadas actuales de la posición de la mano.
@@ -121,25 +122,23 @@ class Controller:
         x = int(position[0] * sx)
         y = int(position[1] * sy)
         if Controller.prev_hand is None:
-            Controller.prev_hand = (x, y)
-
+            Controller.prev_hand = x, y
         delta_x = x - Controller.prev_hand[0]
         delta_y = y - Controller.prev_hand[1]
 
         distsq = delta_x**2 + delta_y**2
         ratio = 1
-        Controller.prev_hand = (x, y)
+        Controller.prev_hand = [x, y]
 
         if distsq <= 25:
             ratio = 0
         elif distsq <= 900:
-            ratio = 0.07 * (distsq ** 0.5)
+            ratio = 0.07 * (distsq ** (1 / 2))
         else:
             ratio = 2.1
         x, y = x_old + delta_x * ratio, y_old + delta_y * ratio
         return (x, y)
 
-    @staticmethod
     def pinch_control_init(hand_result):
         """Inicializa los atributos para el gesto de pinza."""
         Controller.pinchstartxcoord = hand_result.landmark[8].x
@@ -148,7 +147,6 @@ class Controller:
         Controller.prevpinchlv = 0
         Controller.framecount = 0
 
-    @staticmethod
     def pinch_control(hand_result, controlHorizontal, controlVertical):
         """
         Llama a `controlHorizontal` o `controlVertical` según el movimiento del gesto de pinza.
@@ -169,9 +167,9 @@ class Controller:
             else:
                 controlVertical()  # Eje Y
 
-        lvx = Controller.get_position(hand_result)[0] - Controller.pinchstartxcoord
-        lvy = Controller.get_position(hand_result)[1] - Controller.pinchstartycoord
-        
+        lvx = Controller.getpinchxlv(hand_result)
+        lvy = Controller.getpinchylv(hand_result)
+            
         if abs(lvy) > abs(lvx) and abs(lvy) > Controller.pinch_threshold:
             Controller.pinchdirectionflag = False
             if abs(Controller.prevpinchlv - lvy) < Controller.pinch_threshold:
@@ -188,13 +186,12 @@ class Controller:
                 Controller.prevpinchlv = lvx
                 Controller.framecount = 0
 
-    @staticmethod
-    def handle_controls(gesture, hand_result):
+    def handle_controls(gesture, hand_result):  
         """Implementa la funcionalidad para todos los gestos detectados."""      
         x, y = None, None
         if gesture != Gest.PALM:
             x, y = Controller.get_position(hand_result)
-
+        
         # Reinicio de banderas
         if gesture != Gest.FIST and Controller.grabflag:
             Controller.grabflag = False
