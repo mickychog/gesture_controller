@@ -88,6 +88,46 @@ python main.py
 
 El sistema abrirá la cámara y comenzará a procesar los gestos en tiempo real. Los gestos reconocidos se utilizarán para realizar acciones específicas como ajustar el volumen, cambiar el brillo o desplazarse por la pantalla.
 
+## Guía de Uso: Gestos Reconocidos
+
+El sistema detecta y responde a varios gestos, dependiendo de si se realizan con la mano dominante o la no dominante. A continuación, se describen los gestos soportados y sus funcionalidades:
+
+### **Mano Dominante**
+
+1. **Puño Cerrado (FIST):**  
+   - Mueve el cursor mientras se mantiene el clic izquierdo presionado (ideal para arrastrar elementos).
+
+2. **Gesto en "V" (V_GEST):**  
+   - Mueve el cursor sin realizar clics.
+
+3. **Índice Extendido (INDEX):**  
+   - Realiza un clic derecho del ratón.
+
+4. **Dedo Medio Extendido (MID):**  
+   - Realiza un clic izquierdo del ratón.
+
+5. **Dos Dedos Cerrados (TWO_FINGER_CLOSED):**  
+   - Realiza un doble clic del ratón.
+
+6. **Pinza Mayor (PINCH_MAJOR):**  
+   - Controla el brillo o el volumen del sistema. 
+     - **Movimiento Horizontal:** Ajusta el brillo.
+     - **Movimiento Vertical:** Ajusta el volumen.
+
+### **Mano No Dominante**
+
+1. **Puño Cerrado (FIST):**  
+   - No tiene una funcionalidad asignada específica.
+
+2. **Pinza Menor (PINCH_MINOR):**  
+   - Desplazamiento por la pantalla:
+     - **Movimiento Horizontal:** Desplaza horizontalmente (scroll).
+     - **Movimiento Vertical:** Desplaza verticalmente (scroll).
+
+### Notas Importantes:
+- La mano dominante y no dominante se configuran automáticamente según la clasificación de MediaPipe.
+- Los gestos deben ser claros y visibles frente a la cámara para un reconocimiento preciso.
+
 ## Créditos
 
 Este proyecto fue desarrollado por **Miguel Ángel Choque García**, estudiante de la USFX, como parte de su formación en Desarrollo de Aplicaciones Inteligentes.
