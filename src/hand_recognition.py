@@ -108,6 +108,7 @@ class HandRecog:
             dist2 = max(self.get_signed_dist(point[1:]), 0.01)
             ratio = round(dist / dist2, 1)
             self.finger = (self.finger << 1) | (1 if ratio > 0.5 else 0)
+        
 
     def get_gesture(self):
         """

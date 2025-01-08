@@ -5,6 +5,30 @@ from ctypes import cast, POINTER
 import screen_brightness_control as sbcontrol
 from .enums.gesture_enums import Gest, HLabel
 
+# Función para mover el cursor de manera segura
+def safe_move_to(x, y, duration=0.1):
+    """
+    Mueve el cursor asegurándose de que no salga de los límites de la pantalla.
+    
+    Parameters:
+    -----------
+    x : int
+        Coordenada X a la que se moverá el cursor.
+    y : int
+        Coordenada Y a la que se moverá el cursor.
+    duration : float, optional
+        Duración del movimiento, en segundos (por defecto 0.1).
+    """
+    # Obtener el tamaño de la pantalla
+    screen_width, screen_height = pyautogui.size()
+
+    # Limitar las coordenadas dentro de los bordes de la pantalla
+    x = min(max(0, x), screen_width - 1)
+    y = min(max(0, y), screen_height - 1)
+
+    # Mover el cursor a las coordenadas ajustadas
+    pyautogui.moveTo(x, y, duration=duration)
+    
 class Controller:
     """
     Clase que ejecuta comandos según los gestos detectados.
@@ -189,6 +213,12 @@ class Controller:
     def handle_controls(gesture, hand_result):  
         """Implementa la funcionalidad para todos los gestos detectados."""      
         x, y = None, None
+        
+        # Manejo de gestos desconocidos
+        if gesture == Gest.UNKNOWN:
+            print("Gestión de gestos desconocidos omitida.")
+            return
+    
         if gesture != Gest.PALM:
             x, y = Controller.get_position(hand_result)
         
@@ -206,13 +236,13 @@ class Controller:
         # Implementación de gestos
         if gesture == Gest.V_GEST:
             Controller.flag = True
-            pyautogui.moveTo(x, y, duration=0.1)
+            safe_move_to(x, y, duration=0.1)
 
         elif gesture == Gest.FIST:
             if not Controller.grabflag: 
                 Controller.grabflag = True
                 pyautogui.mouseDown(button="left")
-            pyautogui.moveTo(x, y, duration=0.1)
+            safe_move_to(x, y, duration=0.1)
 
         elif gesture == Gest.MID and Controller.flag:
             pyautogui.click()
@@ -237,3 +267,4 @@ class Controller:
                 Controller.pinch_control_init(hand_result)
                 Controller.pinchmajorflag = True
             Controller.pinch_control(hand_result, Controller.changesystembrightness, Controller.changesystemvolume)
+        

@@ -22,6 +22,12 @@ class Gest(IntEnum):
     TWO_FINGER_CLOSED = 34  # Dos dedos juntos cerrados
     PINCH_MAJOR = 35  # Gesto de pinza con mano principal
     PINCH_MINOR = 36  # Gesto de pinza con mano secundaria
+    THREE_FINGER_SCROLL = 37  # Tres dedos extendidos para scroll
+
+    
+    # Gesto no reconocido
+    UNKNOWN = -1  # Valor predeterminado para gestos no reconocidos
+
 
 # Etiquetas de multi-mano
 class HLabel(IntEnum):

@@ -145,32 +145,47 @@ class GestureController:
                     handminor.update_hand_result(GestureController.hr_minor)
 
                     handmajor.set_finger_state()
-                    handminor.set_finger_state()
-                    gest_name = handminor.get_gesture()
-
-                # Asegurarse de que gest_name sea un miembro del enum Gest
-                    try:
-                        gest_name = Gest(gest_name)
-                    except ValueError:
-                        print(f"Gesto no reconocido: {gest_name}")
-                        continue
-                
-                # Mostrar el gesto reconocido en consola
-                    if gest_name == Gest.PINCH_MINOR:
-                        print(f"Gesto reconocido: {gest_name.name} (Pinza menor - Desplazamiento)")
-                        Controller.handle_controls(gest_name, handminor.hand_result)
-                    else:
-                        gest_name = Gest(handmajor.get_gesture())  # Convertir también aquí
-                        print(f"Gesto reconocido: {gest_name.name} (Pinza mayor - Volumen/Brillo)")
-                        Controller.handle_controls(gest_name, handmajor.hand_result)
+                    handminor.set_finger_state()                    
                     
-                    # Dibuja los landmarks de las manos
-                    for hand_landmarks in results.multi_hand_landmarks:
+                        # Reconocer gestos
+                    try:
+                        gest_name_major = Gest(handmajor.get_gesture())
+                    except ValueError:
+                        print(f"Gesto no reconocido (mano dominante): {handmajor.get_gesture()}")
+                        gest_name_major = Gest.UNKNOWN
+
+                    try:
+                        gest_name_minor = Gest(handminor.get_gesture())
+                    except ValueError:
+                        print(f"Gesto no reconocido (mano no dominante): {handminor.get_gesture()}")
+                        gest_name_minor = Gest.UNKNOWN
+
+                    # Dibuja un marcador en la mano con el gesto reconocido
+                    for idx, hand_landmarks in enumerate(results.multi_hand_landmarks):
                         mp_drawing.draw_landmarks(
                             image, 
                             hand_landmarks, 
                             mp_hands.HAND_CONNECTIONS
-                        )
+                    )
+                        # Extraer coordenadas del landmark (ejemplo: punto 9)
+                        x = int(hand_landmarks.landmark[9].x * image.shape[1])
+                        y = int(hand_landmarks.landmark[9].y * image.shape[0])
+
+                        # Mostrar el gesto reconocido en pantalla
+                        if hand_landmarks == GestureController.hr_major:
+                            cv2.putText(image, f"{gest_name_major.name}", (x, y - 20),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                        elif hand_landmarks == GestureController.hr_minor:
+                            cv2.putText(image, f"{gest_name_minor.name}", (x, y - 20),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
+
+                    # Ejecutar controles basados en gestos
+                    if gest_name_major != Gest.UNKNOWN and gest_name_major != Gest.PALM:
+                        Controller.handle_controls(gest_name_major, handmajor.hand_result)
+                    
+                    # Limitamos las acciones para la mano no dominante a ciertos gestos
+                    if gest_name_minor in [Gest.PINCH_MINOR] and gest_name_minor != Gest.PALM:
+                        Controller.handle_controls(gest_name_minor, handminor.hand_result)
                 else:
                     Controller.prev_hand = None
                     
