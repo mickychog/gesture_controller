@@ -1,0 +1,46 @@
+# Ignorar archivos generados por el entorno virtual
+env/
+.venv/
+gest/
+
+# Ignorar archivos de configuración de Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Ignorar archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Ignorar configuraciones de IDEs/editores comunes
+.vscode/
+.idea/
+
+# Ignorar dependencias instaladas
+*.egg-info/
+dist/
+build/
+
+# Ignorar logs y archivos temporales
+*.log
+*.tmp
+*.bak
+*.swp
+
+# Archivos específicos de Conda
+conda-meta/
+*.conda
+
+# Ignorar configuraciones de OpenCV/MediaPipe generadas automáticamente
+*.cache/
+mediapipe_tmp/
+
+# Archivos de configuración del usuario
+settings.py
+config/settings_local.py
+
+# Ignorar bases de datos temporales (si las usas)
+*.sqlite3
+
+# Ignorar otros archivos específicos del usuario
+!README.md
