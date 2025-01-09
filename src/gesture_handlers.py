@@ -70,6 +70,7 @@ class Controller:
     trial = True
     flag = False
     grabflag = False
+    scrollflag= False
     pinchmajorflag = False
     pinchminorflag = False
     pinchstartxcoord = None
@@ -123,9 +124,9 @@ class Controller:
     def scrollHorizontal():
         """Realiza un desplazamiento horizontal en pantalla."""
         pyautogui.keyDown('shift')
-        pyautogui.keyDown('ctrl')
+        #pyautogui.keyDown('ctrl')
         pyautogui.scroll(-120 if Controller.pinchlv > 0.0 else 120)
-        pyautogui.keyUp('ctrl')
+        #pyautogui.keyUp('ctrl')
         pyautogui.keyUp('shift')
 
     def get_position(hand_result):
@@ -211,7 +212,7 @@ class Controller:
                 Controller.framecount = 0
 
     def handle_controls(gesture, hand_result):  
-        """Implementa la funcionalidad para todos los gestos detectados."""      
+        """Implementa la funcionalidad para todos los gestos detectados."""     
         x, y = None, None
         
         # Manejo de gestos desconocidos
@@ -229,9 +230,13 @@ class Controller:
 
         if gesture != Gest.PINCH_MAJOR and Controller.pinchmajorflag:
             Controller.pinchmajorflag = False
+        
+        if gesture != Gest.THREE_FINGER_SCROLL and Controller.scrollflag:
+            Controller.scrollflag = False
 
-        if gesture != Gest.PINCH_MINOR and Controller.pinchminorflag:
-            Controller.pinchminorflag = False
+
+        # if gesture != Gest.PINCH_MINOR and Controller.pinchminorflag:
+        #     Controller.pinchminorflag = False
 
         # Implementación de gestos
         if gesture == Gest.V_GEST:
@@ -256,15 +261,22 @@ class Controller:
             pyautogui.doubleClick()
             Controller.flag = False
 
-        elif gesture == Gest.PINCH_MINOR:
-            if not Controller.pinchminorflag:
+        # elif gesture == Gest.PINCH_MINOR:
+        #     if not Controller.pinchminorflag:
+        #         Controller.pinch_control_init(hand_result)
+        #         Controller.pinchminorflag = True
+        #     Controller.pinch_control(hand_result, Controller.scrollHorizontal, Controller.scrollVertical)
+        
+        elif gesture == Gest.THREE_FINGER_SCROLL:
+            if not Controller.scrollflag:  
                 Controller.pinch_control_init(hand_result)
-                Controller.pinchminorflag = True
+                Controller.scrollflag = True
             Controller.pinch_control(hand_result, Controller.scrollHorizontal, Controller.scrollVertical)
+
         
         elif gesture == Gest.PINCH_MAJOR:
             if not Controller.pinchmajorflag:
                 Controller.pinch_control_init(hand_result)
                 Controller.pinchmajorflag = True
             Controller.pinch_control(hand_result, Controller.changesystembrightness, Controller.changesystemvolume)
-        
+            

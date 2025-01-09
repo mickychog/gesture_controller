@@ -184,8 +184,8 @@ class GestureController:
                         Controller.handle_controls(gest_name_major, handmajor.hand_result)
                     
                     # Limitamos las acciones para la mano no dominante a ciertos gestos
-                    if gest_name_minor in [Gest.PINCH_MINOR] and gest_name_minor != Gest.PALM:
-                        Controller.handle_controls(gest_name_minor, handminor.hand_result)
+                    # if gest_name_minor in [Gest.THREE_FINGER_SCROLL] and gest_name_minor != Gest.PALM:
+                    #     Controller.handle_controls(gest_name_minor, handminor.hand_result)
                 else:
                     Controller.prev_hand = None
                     

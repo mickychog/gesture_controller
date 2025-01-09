@@ -21,7 +21,7 @@ class Gest(IntEnum):
     V_GEST = 33  # Gesto en forma de "V" (paz)
     TWO_FINGER_CLOSED = 34  # Dos dedos juntos cerrados
     PINCH_MAJOR = 35  # Gesto de pinza con mano principal
-    PINCH_MINOR = 36  # Gesto de pinza con mano secundaria
+    #PINCH_MINOR = 36  # Gesto de pinza con mano secundaria
     THREE_FINGER_SCROLL = 37  # Tres dedos extendidos para scroll
 
     

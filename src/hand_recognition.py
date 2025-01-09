@@ -21,6 +21,7 @@ class HandRecog:
         self.frame_count = 0  # Contador de frames desde la última actualización de `ori_gesture`
         self.hand_result = None  # Resultado de MediaPipe para la mano
         self.hand_label = hand_label  # Etiqueta de la mano (principal o secundaria)
+        
 
     def update_hand_result(self, hand_result):
         """Actualiza los resultados de MediaPipe para la mano."""
@@ -101,7 +102,7 @@ class HandRecog:
         if not self.hand_result or not self.hand_result.landmark:
             return
 
-        points = [[8, 5, 0], [12, 9, 0], [16, 13, 0], [20, 17, 0]]
+        points = [[8, 5, 0], [12, 9, 0], [16, 13, 0], [20, 17, 0]] # Índice, Medio, Anular, Meñique
         self.finger = 0
         for idx, point in enumerate(points):
             dist = max(self.get_signed_dist(point[:2]), 0.01)  # Evitar división por cero
@@ -123,12 +124,21 @@ class HandRecog:
             return Gest.PALM
 
         current_gesture = Gest.PALM
+            # Detectar PINCH_MAJOR
         if self.finger in [Gest.LAST3, Gest.LAST4] and self.get_dist([8, 4]) < 0.05:
-            if self.hand_label == HLabel.MINOR:
-                current_gesture = Gest.PINCH_MINOR
-            else:
-                current_gesture = Gest.PINCH_MAJOR
+            current_gesture = Gest.PINCH_MAJOR
 
+        # Detectar tres dedos del medio levantados para scroll
+        elif self.finger == 0b01110:  # Índice, Medio y Anular levantados (binario: 01110)
+            current_gesture = Gest.THREE_FINGER_SCROLL
+            
+        # if self.finger in [Gest.LAST3, Gest.LAST4] and self.get_dist([8, 4]) < 0.05:
+        #     if self.hand_label == HLabel.MINOR:
+        #         current_gesture = Gest.PINCH_MINOR
+        #     else:
+        #         current_gesture = Gest.PINCH_MAJOR
+
+        # Detectar gestos como V_GEST, TWO_FINGER_CLOSED, etc.
         elif Gest.FIRST2 == self.finger:
             point = [[8, 12], [5, 9]]
             dist1 = self.get_dist(point[0])
